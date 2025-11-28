@@ -20,4 +20,8 @@ spring:
           issuer-uri: ${KEYCLOAK_FULL_URL}/realms/${KEYCLOAK_REALM_NAME}
 
 springdoc:
-  pathsToMatch: /api/**
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui/docs.html
