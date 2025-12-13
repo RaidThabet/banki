@@ -67,7 +67,7 @@ public class AccountService {
         accountDTO.setId(account.getId());
         accountDTO.setBalance(account.getBalance());
         accountDTO.setStatus(account.getStatus());
-        accountDTO.setOwnerId(account.getOwnerId() == null ? null : account.getOwnerId().getId());
+        accountDTO.setOwnerId(account.getOwner() == null ? null : account.getOwner().getId());
         return accountDTO;
     }
 
@@ -76,7 +76,7 @@ public class AccountService {
         account.setStatus(accountDTO.getStatus());
         final User ownerId = accountDTO.getOwnerId() == null ? null : userRepository.findById(accountDTO.getOwnerId())
                 .orElseThrow(() -> new NotFoundException("ownerId not found"));
-        account.setOwnerId(ownerId);
+        account.setOwner(ownerId);
         return account;
     }
 

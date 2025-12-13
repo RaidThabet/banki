@@ -46,8 +46,8 @@ public class Account {
     private AccountStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id_id", nullable = false)
-    private User ownerId;
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @OneToMany(mappedBy = "accountId")
     private Set<Transaction> transactions = new HashSet<>();

@@ -33,7 +33,7 @@ public class User {
     @Column
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "ownerId")
+    @OneToMany(mappedBy = "owner")
     private Set<Account> accounts = new HashSet<>();
 
     @CreatedDate
