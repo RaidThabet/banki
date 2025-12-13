@@ -37,6 +37,23 @@ public class AccountController {
         return ResponseEntity.ok(accountDTOS);
     }
 
+    @GetMapping("{account_id}")
+    public ResponseEntity<AccountDTO> getAccount(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("account_id") UUID accountId
+    ) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        Account account = accountsService.getAccount(userId, accountId);
+        AccountDTO accountDTO = AccountDTO.builder()
+                .id(accountId)
+                .balance(account.getBalance())
+                .status(account.getStatus())
+                .ownerId(userId)
+                .build();
+
+        return ResponseEntity.ok(accountDTO);
+    }
+
     @PostMapping
     public ResponseEntity<AccountDTO> createAccount(
             @AuthenticationPrincipal Jwt jwt,

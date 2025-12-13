@@ -38,5 +38,9 @@ public class AccountsService {
         return accountRepository.save(account);
     }
 
-//    Account createAccount()
+    public Account getAccount(UUID ownerId, UUID accountId) {
+
+        return accountRepository.findAccountsByIdAndOwner_Id(accountId, ownerId);
+    }
+
 }

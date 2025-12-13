@@ -8,4 +8,6 @@ import tp.securite.banki.domain.Account;
 
 public interface AccountRepository extends JpaRepository<Account, UUID> {
     List<Account> findAccountsByOwner_Id(UUID ownerId);
+
+    Account findAccountsByIdAndOwner_Id(UUID id, UUID ownerId);
 }
