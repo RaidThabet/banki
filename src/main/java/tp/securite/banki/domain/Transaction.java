@@ -20,6 +20,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import tp.securite.banki.model.TransactionStatus;
+import tp.securite.banki.model.TransactionType;
 
 
 @Entity
@@ -36,13 +37,8 @@ public class Transaction {
     private UUID id;
 
     @Column(nullable = false)
-    private String type;
-
-    @Column(nullable = false)
-    private UUID fromAccountID;
-
-    @Column(nullable = false)
-    private UUID toAccountID;
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
 
     @Column(nullable = false)
     private Double amount;

@@ -1,33 +1,29 @@
 package tp.securite.banki.model;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.*;
+
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
 
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TransactionDTO {
 
+    @org.hibernate.validator.constraints.UUID
     private UUID id;
 
     @NotNull
-    @Size(max = 255)
-    private String type;
-
-    @NotNull
-    private UUID fromAccountID;
-
-    @NotNull
-    private UUID toAccountID;
+    private TransactionType type;
 
     @NotNull
     private Double amount;
 
-    @NotNull
-    private TransactionStatus status;
+    @Builder.Default
+    private TransactionStatus status = TransactionStatus.PENDING;
 
     @NotNull
     private UUID accountId;
