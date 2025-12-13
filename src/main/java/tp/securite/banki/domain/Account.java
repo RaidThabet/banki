@@ -49,7 +49,7 @@ public class Account {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @OneToMany(mappedBy = "accountId")
+    @OneToMany(mappedBy = "account")
     private Set<Transaction> transactions = new HashSet<>();
 
     @CreatedDate

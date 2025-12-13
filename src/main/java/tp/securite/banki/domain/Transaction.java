@@ -52,8 +52,8 @@ public class Transaction {
     private TransactionStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id_id", nullable = false)
-    private Account accountId;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

@@ -6,7 +6,4 @@ import tp.securite.banki.domain.Transaction;
 
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-
-    Transaction findFirstByAccountIdId(UUID id);
-
 }
