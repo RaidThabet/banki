@@ -1,5 +1,6 @@
 package tp.securite.banki.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ public class AccountDTO {
     private UUID id;
 
     @NotNull
+    @Schema(example = "100.5")
     private Double balance;
 
     @NotNull
