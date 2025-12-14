@@ -42,10 +42,10 @@ public class AccountsService {
     public Account getAccount(UUID ownerId, UUID accountId) throws Exception {
 
         Account account = accountRepository.findAccountsByIdAndOwner_Id(accountId, ownerId)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.ACCOUNT_NOT_FOUND, accountId, ownerId));
 
         if (account.getStatus().equals(AccountStatus.LOCKED)) {
-            throw new Exception("Account is locked");
+            throw new BusinessException(ErrorCode.ACCOUNT_LOCKED, accountId);
         }
 
         return account;
