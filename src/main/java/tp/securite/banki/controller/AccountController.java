@@ -1,10 +1,6 @@
 package tp.securite.banki.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +11,6 @@ import tp.securite.banki.domain.Account;
 import tp.securite.banki.model.AccountDTO;
 import tp.securite.banki.service.AccountsService;
 import tp.securite.banki.swagger.AccountControllerResponses;
-import tp.securite.banki.swagger.SwaggerExamples;
 
 import java.util.List;
 import java.util.UUID;
