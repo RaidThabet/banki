@@ -41,7 +41,7 @@ public class AccountController {
     public ResponseEntity<AccountDTO> getAccount(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable("account_id") UUID accountId
-    ) {
+    ) throws Exception {
         UUID userId = UUID.fromString(jwt.getSubject());
         Account account = accountsService.getAccount(userId, accountId);
         AccountDTO accountDTO = AccountDTO.builder()

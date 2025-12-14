@@ -1,6 +1,7 @@
 package tp.securite.banki.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tp.securite.banki.domain.Account;
 import tp.securite.banki.domain.User;
@@ -38,10 +39,25 @@ public class AccountsService {
         return accountRepository.save(account);
     }
 
-    public Account getAccount(UUID ownerId, UUID accountId) {
+    public Account getAccount(UUID ownerId, UUID accountId) throws Exception {
 
-        return accountRepository.findAccountsByIdAndOwner_Id(accountId, ownerId)
+        Account account = accountRepository.findAccountsByIdAndOwner_Id(accountId, ownerId)
                 .orElseThrow();
+
+        if (account.getStatus().equals(AccountStatus.LOCKED)) {
+            throw new Exception("Account is locked");
+        }
+
+        return account;
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    public void activateAccounts() {
+        List<Account> lockedAccounts = accountRepository.findAllByStatus(AccountStatus.LOCKED);
+
+        lockedAccounts.forEach(account -> account.setStatus(AccountStatus.ACTIVE));
+
+        accountRepository.saveAll(lockedAccounts);
     }
 
 }

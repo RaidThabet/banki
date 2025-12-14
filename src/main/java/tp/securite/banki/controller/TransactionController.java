@@ -24,7 +24,7 @@ public class TransactionController {
     public ResponseEntity<List<TransactionDTO>> getAll(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable("account_id") UUID accountId
-    ) {
+    ) throws Exception {
         UUID userId = UUID.fromString(jwt.getSubject());
         List<TransactionDTO> transactionDTOS = transactionService.listTransactionsForAccount(userId, accountId).stream()
                 .map(transaction -> TransactionDTO.builder()

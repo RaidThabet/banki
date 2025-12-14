@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tp.securite.banki.domain.Account;
 import tp.securite.banki.domain.Transaction;
+import tp.securite.banki.model.AccountStatus;
 import tp.securite.banki.model.TransactionStatus;
 import tp.securite.banki.model.TransactionType;
 import tp.securite.banki.repos.AccountRepository;
@@ -22,9 +23,13 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
-    public List<Transaction> listTransactionsForAccount( UUID userID, UUID accountId) {
-        accountRepository.findAccountsByIdAndOwner_Id(accountId, userID)
+    public List<Transaction> listTransactionsForAccount( UUID userID, UUID accountId) throws Exception {
+        Account account = accountRepository.findAccountsByIdAndOwner_Id(accountId, userID)
                 .orElseThrow();
+
+        if (account.getStatus().equals(AccountStatus.LOCKED)) {
+            throw new Exception("Account is locked");
+        }
         return transactionRepository.findByAccount_Id(accountId);
     }
 
@@ -38,6 +43,10 @@ public class TransactionService {
                 .orElseThrow();
         Account beneficiaryAccount = accountRepository.findById(beneficiaryId)
                 .orElseThrow();
+
+        if (userAccount.getStatus().equals(AccountStatus.LOCKED) || beneficiaryAccount.getStatus().equals(AccountStatus.LOCKED)) {
+            throw new Exception("One of the accounts is locked");
+        }
 
         double currentBalance = userAccount.getBalance();
 
