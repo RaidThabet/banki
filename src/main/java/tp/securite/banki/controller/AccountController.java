@@ -1,5 +1,11 @@
 package tp.securite.banki.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -8,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import tp.securite.banki.domain.Account;
 import tp.securite.banki.model.AccountDTO;
 import tp.securite.banki.service.AccountsService;
+import tp.securite.banki.swagger.AccountControllerResponses;
+import tp.securite.banki.swagger.SwaggerExamples;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,11 +23,17 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/accounts")
 @RequiredArgsConstructor
+@Tag(name = "Accounts", description = "API endpoints for managing user accounts")
 public class AccountController {
 
     private final AccountsService accountsService;
 
     @GetMapping
+    @Operation(
+        summary = "Get all accounts",
+        description = "Retrieve all accounts owned by the authenticated user"
+    )
+   @AccountControllerResponses.GetAccountsListResponse
     public ResponseEntity<List<AccountDTO>> getAll(
             @AuthenticationPrincipal Jwt jwt
             ) {
@@ -38,6 +52,11 @@ public class AccountController {
     }
 
     @GetMapping("{account_id}")
+    @Operation(
+        summary = "Get account by ID",
+        description = "Retrieve a specific account by its ID. The user can only access their own accounts"
+    )
+    @AccountControllerResponses.GetAccountResponse
     public ResponseEntity<AccountDTO> getAccount(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable("account_id") UUID accountId
@@ -55,6 +74,11 @@ public class AccountController {
     }
 
     @PostMapping
+    @Operation(
+        summary = "Create a new account",
+        description = "Create a new bank account for the authenticated user"
+    )
+    @AccountControllerResponses.CreateAccountResponse
     public ResponseEntity<AccountDTO> createAccount(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody AccountDTO accountDTO
