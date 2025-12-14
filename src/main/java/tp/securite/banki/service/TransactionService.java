@@ -22,7 +22,9 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
 
-    public List<Transaction> listTransactionsForAccount(UUID accountId) {
+    public List<Transaction> listTransactionsForAccount( UUID userID, UUID accountId) {
+        accountRepository.findAccountsByIdAndOwner_Id(accountId, userID)
+                .orElseThrow();
         return transactionRepository.findByAccount_Id(accountId);
     }
 

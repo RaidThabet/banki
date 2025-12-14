@@ -2,6 +2,8 @@ package tp.securite.banki.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import tp.securite.banki.domain.Transaction;
 import tp.securite.banki.model.CreateTransactionDTO;
@@ -20,9 +22,11 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<List<TransactionDTO>> getAll(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable("account_id") UUID accountId
     ) {
-        List<TransactionDTO> transactionDTOS = transactionService.listTransactionsForAccount(accountId).stream()
+        UUID userId = UUID.fromString(jwt.getSubject());
+        List<TransactionDTO> transactionDTOS = transactionService.listTransactionsForAccount(userId, accountId).stream()
                 .map(transaction -> TransactionDTO.builder()
                         .id(transaction.getId())
                         .type(transaction.getType())

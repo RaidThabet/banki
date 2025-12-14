@@ -40,7 +40,8 @@ public class AccountsService {
 
     public Account getAccount(UUID ownerId, UUID accountId) {
 
-        return accountRepository.findAccountsByIdAndOwner_Id(accountId, ownerId);
+        return accountRepository.findAccountsByIdAndOwner_Id(accountId, ownerId)
+                .orElseThrow();
     }
 
 }
