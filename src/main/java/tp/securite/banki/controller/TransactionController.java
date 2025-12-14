@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("{account_id}/transactions")
+@RequestMapping("accounts/{account_id}/transactions")
 @RequiredArgsConstructor
 public class TransactionController {
 
