@@ -13,6 +13,8 @@ import tp.securite.banki.service.BeneficiaryService;
 import java.util.List;
 import java.util.UUID;
 
+// TODO: user BeneficiaryDTO instead
+
 @RestController
 @RequestMapping("/beneficiaries")
 @RequiredArgsConstructor
@@ -46,11 +48,13 @@ public class BeneficiaryController {
         UUID userId = UUID.fromString(jwt.getSubject());
         String name = requestDTO.getName();
         String bankName = requestDTO.getBankName();
+        UUID accountId = requestDTO.getId();
 
         Beneficiary createdBeneficiary = beneficiaryService.createBeneficiary(
                 userId,
                 name,
-                bankName
+                bankName,
+                accountId
         );
 
         CreateBeneficiaryResponseDTO responseDTO = CreateBeneficiaryResponseDTO.builder()
