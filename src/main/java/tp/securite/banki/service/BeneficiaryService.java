@@ -27,7 +27,7 @@ public class BeneficiaryService {
         User ownerUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
         accountRepository.findById(accountId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ACCOUNT_NOT_FOUND, accountId, userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_ACCOUNT_NOT_FOUND, accountId, userId));
 
         Beneficiary beneficiary = new Beneficiary();
         if (bankName.equals("Banki")) {
