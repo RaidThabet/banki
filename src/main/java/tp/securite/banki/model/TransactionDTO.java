@@ -1,6 +1,7 @@
 package tp.securite.banki.model;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.util.UUID;
@@ -13,13 +14,13 @@ import java.util.UUID;
 @Builder
 public class TransactionDTO {
 
-    @org.hibernate.validator.constraints.UUID
     private UUID id;
 
     @NotNull
     private TransactionType type;
 
     @NotNull
+    @Positive(message = "Amount should be positive")
     private Double amount;
 
     @Builder.Default
