@@ -2,6 +2,7 @@ package tp.securite.banki.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tp.securite.banki.domain.Account;
 import tp.securite.banki.domain.Transaction;
@@ -11,6 +12,7 @@ import tp.securite.banki.repos.AccountRepository;
 import tp.securite.banki.repos.TransactionRepository;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -62,5 +64,19 @@ public class TransactionService {
         transactionRepository.save(creditTransaction);
 
         return transactionRepository.save(debitTransaction);
+    }
+
+    @Scheduled(fixedDelay = 60000) // run every 60 seconds
+    public void updateTransactionStatus() {
+        Random random = new Random();
+        List<Transaction> pendingTransactions = transactionRepository.findByStatus(TransactionStatus.PENDING);
+
+        pendingTransactions.forEach(transaction -> {
+            TransactionStatus randomStatus = random.nextBoolean() ?
+                    TransactionStatus.SUCCESS :
+                    TransactionStatus.FAILED;
+            transaction.setStatus(randomStatus);
+        });
+        transactionRepository.saveAll(pendingTransactions);
     }
 }
