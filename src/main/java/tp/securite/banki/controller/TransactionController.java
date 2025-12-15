@@ -2,6 +2,7 @@ package tp.securite.banki.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -57,7 +58,8 @@ public class TransactionController {
     @TransactionControllerResponses.CreateTransactionResponse
     public ResponseEntity<TransactionDTO> makeTransaction(
             @PathVariable("account_id") UUID accountId,
-            @RequestBody CreateTransactionDTO createTransactionDTO
+            @RequestBody CreateTransactionDTO createTransactionDTO,
+            HttpServletRequest request
     ) throws Exception {
         UUID beneficiaryId = createTransactionDTO.getBeneficiaryId();
         double amount = createTransactionDTO.getAmount();
@@ -65,7 +67,8 @@ public class TransactionController {
         Transaction createdUserTransaction = transactionService.createTransactionForUser(
                 accountId,
                 beneficiaryId,
-                amount
+                amount,
+                request
         );
 
         TransactionDTO transactionDTO = TransactionDTO.builder()

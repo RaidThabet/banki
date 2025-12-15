@@ -1,0 +1,28 @@
+# Node/Frontend
+node_modules/
+npm-debug.log
+.npm
+src/main/webapp/
+
+# Environment
+.env
+.env.development
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Build artifacts (but keep source)
+target/

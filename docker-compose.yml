@@ -1,5 +1,17 @@
 name: "banki-app"
 services:
+  banki-backend:
+    build:
+      context: .
+      dockerfile: spring.Dockerfile
+    container_name: "banki-backend-app"
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - banki-postgres
+      - keycloak
   banki-postgres:
     container_name: "banki-postgres"
     image: postgres:18.0
@@ -11,7 +23,7 @@ services:
     ports:
     - 5432:5432
     volumes:
-      - postgres-test:/data/postgres
+      - postgres:/data/postgres
 
   keycloak-db:
     image: postgres:18.0
@@ -34,6 +46,7 @@ services:
     command:
       - start-dev
       - --import-realm
+      - --hostname=http://keycloak:8080
     ports:
       - "9090:8080"
     depends_on:
