@@ -1,5 +1,7 @@
+name: "banki-app"
 services:
-  postgres:
+  banki-postgres:
+    container_name: "banki-postgres"
     image: postgres:18.0
     environment:
       POSTGRES_USER: ${DB_USERNAME}
@@ -9,11 +11,11 @@ services:
     ports:
     - 5432:5432
     volumes:
-      - postgres:/data/postgres
+      - postgres-test:/data/postgres
 
   keycloak-db:
     image: postgres:18.0
-    container_name: keycloak-db
+    container_name: "banki-keycloak-db"
     ports:
       - "5433:5432"
     environment:
@@ -25,9 +27,13 @@ services:
       - keycloak-postgres:/data/postgres
 
   keycloak:
+    container_name: "banki-keycloak"
     image: quay.io/keycloak/keycloak:26.3.3
+    volumes:
+      - ./keycloak-export:/opt/keycloak/data/import
     command:
       - start-dev
+      - --import-realm
     ports:
       - "9090:8080"
     depends_on:
@@ -42,6 +48,6 @@ services:
 
 
 volumes:
-  postgres:
+  postgres-test:
   keycloak-postgres:
-  keycloak:
+  keycloak-test:

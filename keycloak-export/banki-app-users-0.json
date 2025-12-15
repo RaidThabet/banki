@@ -1,0 +1,56 @@
+{
+  "realm" : "banki-app",
+  "users" : [ {
+    "id" : "23bc02ca-05b7-4715-8d00-a5db3be7fbe8",
+    "username" : "test_user",
+    "firstName" : "test",
+    "lastName" : "user",
+    "email" : "thabet.raid123@gmail.com",
+    "emailVerified" : true,
+    "attributes" : {
+      "phoneNumber" : [ "55640597" ]
+    },
+    "enabled" : true,
+    "createdTimestamp" : 1764342801462,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "83352fd6-78b3-4107-95f2-f3095c7884d5",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1764342813353,
+      "secretData" : "{\"value\":\"zCxsn4iT/XJbO782JSZ3Dhx/ORskSdL1BbW861PuQLQ=\",\"salt\":\"gB4W8WnbIUttjo5dBycgtQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-banki-app" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "d89dee72-e691-4eae-9555-7132eed26682",
+    "username" : "test_user2",
+    "firstName" : "Test",
+    "lastName" : "User2",
+    "email" : "thabet.raid112@gmail.com",
+    "emailVerified" : true,
+    "attributes" : {
+      "phoneNumber" : [ "55640597" ]
+    },
+    "enabled" : true,
+    "createdTimestamp" : 1765660857647,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "2bdc36df-1c72-40d5-ae39-992f2140fc59",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1765660884788,
+      "secretData" : "{\"value\":\"rDpdcu8Eb00lu+QQJhTd649Ic3nSekYbcuKVmWQlw9w=\",\"salt\":\"wIX5A73Lte9Z3xB8CeCQew==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-banki-app" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}
