@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,7 +62,8 @@ public class BeneficiaryController {
     @BeneficiaryControllerResponses.CreateBeneficiaryResponse
     public ResponseEntity<CreateBeneficiaryResponseDTO> createBeneficiary(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody BeneficiaryDTO requestDTO
+            @RequestBody BeneficiaryDTO requestDTO,
+            HttpServletRequest request
     ) {
         UUID userId = UUID.fromString(jwt.getSubject());
         String name = requestDTO.getName();
@@ -72,7 +74,8 @@ public class BeneficiaryController {
                 userId,
                 name,
                 bankName,
-                accountId
+                accountId,
+                request
         );
 
         CreateBeneficiaryResponseDTO responseDTO = CreateBeneficiaryResponseDTO.builder()
