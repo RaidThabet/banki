@@ -46,8 +46,6 @@ services:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
 
-
 volumes:
-  postgres-test:
+  postgres:
   keycloak-postgres:
-  keycloak-test:
