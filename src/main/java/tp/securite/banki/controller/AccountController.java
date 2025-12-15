@@ -2,6 +2,7 @@ package tp.securite.banki.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -76,10 +77,11 @@ public class AccountController {
     @AccountControllerResponses.CreateAccountResponse
     public ResponseEntity<AccountDTO> createAccount(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody AccountDTO accountDTO
+            @RequestBody AccountDTO accountDTO,
+            HttpServletRequest request
     ) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        Account createdAccount = accountsService.createAccountForUser(userId, accountDTO);
+        Account createdAccount = accountsService.createAccountForUser(userId, accountDTO, request);
         AccountDTO createdAccountDTO = AccountDTO.builder()
                 .id(createdAccount.getId())
                 .balance(createdAccount.getBalance())

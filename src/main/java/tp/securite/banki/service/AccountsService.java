@@ -1,16 +1,21 @@
 package tp.securite.banki.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tp.securite.banki.domain.Account;
+import tp.securite.banki.domain.AuditLog;
 import tp.securite.banki.domain.User;
 import tp.securite.banki.exceptions.BusinessException;
 import tp.securite.banki.exceptions.ErrorCode;
 import tp.securite.banki.model.AccountDTO;
 import tp.securite.banki.model.AccountStatus;
 import tp.securite.banki.repos.AccountRepository;
+import tp.securite.banki.repos.AuditLogRepository;
 import tp.securite.banki.repos.UserRepository;
+import tp.securite.banki.util.IpAddressExtractor;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,15 +24,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountsService {
 
+    private final IpAddressExtractor ipAddressExtractor;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final AuditLogRepository auditLogRepository;
 
     public List<Account> listAccounts(UUID ownerId) {
-
         return accountRepository.findAccountsByOwner_Id(ownerId);
     }
 
-    public Account createAccountForUser(UUID ownerId, AccountDTO accountDTO) {
+    @Transactional
+    public Account createAccountForUser(UUID ownerId, AccountDTO accountDTO, HttpServletRequest request) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, ownerId));
 
@@ -36,7 +43,21 @@ public class AccountsService {
         account.setStatus(AccountStatus.LOCKED); // initially, the new account is locked
         account.setOwner(owner);
 
-        return accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
+
+        String ipAddress = ipAddressExtractor.getClientIpAddress(request);
+        String auditLogMessage = "User with id %s created a new account with id %s".formatted(owner, savedAccount.getId());
+
+        AuditLog auditLog = AuditLog.builder()
+                .userId(owner)
+                .action("CREATE_ACCOUNT")
+                .ipAddress(ipAddress)
+                .details(auditLogMessage)
+                .build();
+
+        auditLogRepository.save(auditLog);
+
+        return savedAccount;
     }
 
     public Account getAccount(UUID ownerId, UUID accountId) {
