@@ -1,12 +1,12 @@
 name: "banki-app"
 services:
   banki-backend:
+    extra_hosts:
+      - "keycloak.local:172.17.0.1"
     build:
       context: .
       dockerfile: spring.Dockerfile
     container_name: "banki-backend-app"
-    ports:
-      - "8080:8080"
     env_file:
       - .env
     depends_on:
@@ -46,6 +46,10 @@ services:
     command:
       - start-dev
       - --import-realm
+      - --hostname=http://keycloak.local
+      - --hostname-admin=http://admin.keycloak.local
+      - --hostname-strict=true
+      - --proxy-headers=xforwarded
     depends_on:
       - keycloak-db
     environment:
@@ -60,7 +64,7 @@ services:
     image: nginx
     container_name: banki-nginx
     ports:
-      - "9090:9090"
+      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:

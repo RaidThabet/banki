@@ -18,11 +18,16 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${KEYCLOAK_FULL_URL}/realms/${KEYCLOAK_REALM_NAME}/protocol/openid-connect/certs
-#          issuer-uri: ${KEYCLOAK_FULL_URL}/realms/${KEYCLOAK_REALM_NAME}
+          issuer-uri: ${KEYCLOAK_FULL_URL}/realms/${KEYCLOAK_REALM_NAME}
+
+server:
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /
 
 springdoc:
   api-docs:
     enabled: true
     path: /api-docs
   swagger-ui:
-    path: /swagger-ui/docs.html
+    path: /docs.html
