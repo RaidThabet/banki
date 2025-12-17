@@ -1,11 +1,24 @@
 import api from "./api";
 
 export const getBeneficiaries = async () => {
-  const response = await api.get("/beneficiaries");
-  return response.data;
+  try {
+    const response = await api.get("/beneficiaries");
+    // Ensure we always return an array
+    return Array.isArray(response.data)
+      ? response.data
+      : response.data.beneficiaries || [];
+  } catch (error) {
+    console.error("Failed to fetch beneficiaries:", error);
+    return [];
+  }
 };
 
 export const createBeneficiary = async (beneficiary) => {
-  const response = await api.post("/beneficiaries", beneficiary);
-  return response.data;
+  try {
+    const response = await api.post("/beneficiaries", beneficiary);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create beneficiary:", error);
+    return null;
+  }
 };

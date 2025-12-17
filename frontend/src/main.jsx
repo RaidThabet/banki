@@ -8,9 +8,11 @@ import { BeneficiaryProvider } from './contexts/BeneficiaryContext.jsx'
 import { TransferProvider } from './contexts/TransferContext.jsx'
 import { HistoryProvider } from './contexts/HistoryContext.jsx'
 import { AccountProvider } from './contexts/AccountContext.jsx'
+import { KeycloakProvider } from './contexts/KeycloakProvider.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <KeycloakProvider>
     <BrowserRouter>
     <AccountProvider>
     <HistoryProvider>
@@ -24,5 +26,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </HistoryProvider>
     </AccountProvider>
     </BrowserRouter>
+    </KeycloakProvider>
   </React.StrictMode>
 )

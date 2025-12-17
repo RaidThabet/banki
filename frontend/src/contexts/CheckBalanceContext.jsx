@@ -15,7 +15,7 @@ export function CheckBalanceProvider({ children }) {
     async function fetchAccounts() {
       setLoading(true);
       try {
-        const data = await getAccounts(); // call backend API
+        const data = await getAccounts();
         setAccounts(data);
         setActiveAccountId(data[0]?.id || null);
       } catch (error) {

@@ -8,16 +8,21 @@ export function AccountProvider({ children }) {
   const [activeAccountId, setActiveAccountId] = useState(null);
   const [showBalance, setShowBalance] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch accounts from backend
   const fetchAccounts = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await getAccounts(); // GET /accounts
-      setAccounts(data);
-      if (data.length > 0 && !activeAccountId) setActiveAccountId(data[0].id);
-    } catch (error) {
-      console.error("Error fetching accounts:", error);
+      const data = await getAccounts();
+      setAccounts(Array.isArray(data) ? data : []); // defensive
+      if (Array.isArray(data) && data.length > 0 && !activeAccountId) {
+        setActiveAccountId(data[0].id);
+      }
+    } catch (err) {
+      console.error("Error fetching accounts:", err);
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -28,7 +33,7 @@ export function AccountProvider({ children }) {
   }, []);
 
   const activeAccount = useMemo(
-    () => accounts.find((a) => a.id === activeAccountId),
+    () => (Array.isArray(accounts) ? accounts.find((a) => a.id === activeAccountId) : null),
     [accounts, activeAccountId]
   );
 
@@ -72,6 +77,7 @@ export function AccountProvider({ children }) {
         balance,
         styles: stateStyles[balanceState],
         loading,
+        error,
         fetchAccounts,
       }}
     >

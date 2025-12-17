@@ -1,8 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import {
-  getBeneficiaries,
-  createBeneficiary,
-} from "../api/beneficiaries";
+import { getBeneficiaries, createBeneficiary } from "../api/beneficiaries";
 
 const BeneficiaryContext = createContext(null);
 
@@ -16,8 +13,9 @@ const TUNISIAN_BANKS = [
 ];
 
 export const BeneficiaryProvider = ({ children }) => {
-  const [beneficiaries, setBeneficiaries] = useState([]); // ✅ always array
+  const [beneficiaries, setBeneficiaries] = useState([]); // always array
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -27,11 +25,13 @@ export const BeneficiaryProvider = ({ children }) => {
 
   const fetchBeneficiaries = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getBeneficiaries();
-      setBeneficiaries(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Failed to fetch beneficiaries:", error);
+      setBeneficiaries(Array.isArray(data) ? data : []); // defensive
+    } catch (err) {
+      console.error("Failed to fetch beneficiaries:", err);
+      setError(err);
       setBeneficiaries([]);
     } finally {
       setLoading(false);
@@ -54,10 +54,10 @@ export const BeneficiaryProvider = ({ children }) => {
 
     try {
       const newBeneficiary = await createBeneficiary(form);
-      setBeneficiaries((prev) => [...prev, newBeneficiary]);
+      if (newBeneficiary) setBeneficiaries((prev) => [...prev, newBeneficiary]);
       setForm({ name: "", accountNumber: "", bankName: "" });
-    } catch (error) {
-      console.error("Failed to add beneficiary:", error);
+    } catch (err) {
+      console.error("Failed to add beneficiary:", err);
     }
   };
 
@@ -66,6 +66,7 @@ export const BeneficiaryProvider = ({ children }) => {
       value={{
         beneficiaries,
         loading,
+        error,
         form,
         tunisianBanks: TUNISIAN_BANKS,
         fetchBeneficiaries,
@@ -80,8 +81,6 @@ export const BeneficiaryProvider = ({ children }) => {
 
 export const useBeneficiaries = () => {
   const context = useContext(BeneficiaryContext);
-  if (!context) {
-    throw new Error("useBeneficiaries must be used within BeneficiaryProvider");
-  }
+  if (!context) throw new Error("useBeneficiaries must be used within BeneficiaryProvider");
   return context;
 };
