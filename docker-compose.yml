@@ -1,8 +1,6 @@
 name: "banki-app"
 services:
   banki-backend:
-    volumes:
-      - ./certs/keycloak-truststore.p12:/app/certs/keycloak-truststore.p12:ro
     extra_hosts:
       - "keycloak.local:172.17.0.1"
     build:
@@ -14,6 +12,7 @@ services:
     depends_on:
       - banki-postgres
       - keycloak
+
   banki-postgres:
     container_name: "banki-postgres"
     image: postgres:18.0
@@ -45,12 +44,14 @@ services:
     image: quay.io/keycloak/keycloak:26.3.3
     volumes:
       - ./keycloak-export:/opt/keycloak/data/import
-#      - ./certs/keycloak.crt:/certs/keycloak.crt
-#      - ./certs/keycloak.key:/certs/keycloak.key
+      - ./certs/keycloak.crt:/certs/keycloak.crt
+      - ./certs/keycloak.key:/certs/keycloak.key
     command:
-      - start-dev
+      - start
       - --import-realm
-#      - --http-port=80
+      - --http-enabled=true
+      - --https-certificate-file=/certs/keycloak.crt
+      - --https-certificate-key-file=/certs/keycloak.key
       - --hostname=https://keycloak.local
       - --hostname-admin=https://admin.keycloak.local
       - --hostname-strict=true
