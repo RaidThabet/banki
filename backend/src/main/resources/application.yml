@@ -17,8 +17,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${KEYCLOAK_FULL_URL}/realms/${KEYCLOAK_REALM_NAME}/protocol/openid-connect/certs
-          issuer-uri: ${KEYCLOAK_FULL_URL}/realms/${KEYCLOAK_REALM_NAME}
+          jwk-set-uri: ${VITE_KEYCLOAK_FULL_URL}/realms/${VITE_KEYCLOAK_REALM_NAME}/protocol/openid-connect/certs
+          issuer-uri: ${VITE_KEYCLOAK_FULL_URL}/realms/${VITE_KEYCLOAK_REALM_NAME}
 
 server:
   forward-headers-strategy: framework
