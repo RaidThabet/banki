@@ -1,9 +1,9 @@
 import Keycloak from "keycloak-js";
 
 const keycloak = new Keycloak({
-  url: "http://keycloak.local",
+  url: "https://keycloak.local",
   realm: "banki-app",
-  clientId: "spring-boot-app",
+  clientId: "react-app",
 });
 
 export default keycloak;

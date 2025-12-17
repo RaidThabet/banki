@@ -1,6 +1,6 @@
 // KeycloakProvider.jsx
 import React, { useState, useEffect } from "react";
-import keycloak from "../keycloak"; 
+import keycloak from "../keycloak";
 
 export const KeycloakProvider = ({ children }) => {
   const [initialized, setInitialized] = useState(false);
