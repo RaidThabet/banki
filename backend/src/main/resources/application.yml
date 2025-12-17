@@ -24,6 +24,14 @@ server:
   forward-headers-strategy: framework
   servlet:
     context-path: /
+#  ssl:
+#    bundle:
+#      jks:
+#        keycloak-trust:
+#          key-store:
+#            location: file:/app/certs/keycloak-truststore.p12
+#            password: banki-pass
+#            type: PKCS12
 
 springdoc:
   api-docs:

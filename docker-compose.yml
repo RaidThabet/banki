@@ -1,6 +1,8 @@
 name: "banki-app"
 services:
   banki-backend:
+    volumes:
+      - ./certs/keycloak-truststore.p12:/app/certs/keycloak-truststore.p12:ro
     extra_hosts:
       - "keycloak.local:172.17.0.1"
     build:
@@ -43,11 +45,14 @@ services:
     image: quay.io/keycloak/keycloak:26.3.3
     volumes:
       - ./keycloak-export:/opt/keycloak/data/import
+#      - ./certs/keycloak.crt:/certs/keycloak.crt
+#      - ./certs/keycloak.key:/certs/keycloak.key
     command:
       - start-dev
       - --import-realm
-      - --hostname=http://keycloak.local
-      - --hostname-admin=http://admin.keycloak.local
+#      - --http-port=80
+      - --hostname=https://keycloak.local
+      - --hostname-admin=https://admin.keycloak.local
       - --hostname-strict=true
       - --proxy-headers=xforwarded
     depends_on:
@@ -65,8 +70,10 @@ services:
     container_name: banki-nginx
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
     depends_on:
       - keycloak
 
