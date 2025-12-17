@@ -20,6 +20,20 @@ spring:
           jwk-set-uri: ${KEYCLOAK_FULL_URL}/realms/${VITE_KEYCLOAK_REALM_NAME}/protocol/openid-connect/certs
           issuer-uri: ${KEYCLOAK_FULL_URL}/realms/${VITE_KEYCLOAK_REALM_NAME}
 
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${SMTP_KEY}
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    from: no-reply@banki.com
+
 server:
   forward-headers-strategy: framework
   servlet:
@@ -31,3 +45,6 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /docs.html
+
+mail:
+  from: ${FROM_EMAIL}

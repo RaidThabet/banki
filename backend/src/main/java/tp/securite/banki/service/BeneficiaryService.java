@@ -27,6 +27,7 @@ public class BeneficiaryService {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final AuditLogRepository auditLogRepository;
+    private final EmailService emailService;
 
     @Transactional
     public Beneficiary createBeneficiary(
@@ -64,6 +65,12 @@ public class BeneficiaryService {
                 .build();
 
         auditLogRepository.save(auditLog);
+
+        emailService.sendEmail(
+                ownerUser.getEmail(),
+                "Beneficiary Created",
+                "Your beneficiary creation was successful"
+        );
 
         return createdBeneficiary;
     }

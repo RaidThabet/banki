@@ -28,6 +28,7 @@ public class AccountsService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final AuditLogRepository auditLogRepository;
+    private final EmailService emailService;
 
     public List<Account> listAccounts(UUID ownerId) {
         return accountRepository.findAccountsByOwner_Id(ownerId);
@@ -56,6 +57,12 @@ public class AccountsService {
                 .build();
 
         auditLogRepository.save(auditLog);
+
+        emailService.sendEmail(
+                owner.getEmail(),
+                "Account Created",
+                "Your new account creation was successful"
+        );
 
         return savedAccount;
     }

@@ -31,6 +31,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final AuditLogRepository auditLogRepository;
+    private final EmailService emailService;
 
     public List<Transaction> listTransactionsForAccount( UUID userID, UUID accountId) {
         Account account = accountRepository.findAccountsByIdAndOwner_Id(accountId, userID)
@@ -102,6 +103,12 @@ public class TransactionService {
                 .build();
 
         auditLogRepository.save(auditLog);
+
+        emailService.sendEmail(
+                owner.getEmail(),
+                "Transaction Created",
+                "Your transaction of " + amount + " to " + beneficiaryId + " was successful."
+        );
 
         return createdTransaction;
     }
