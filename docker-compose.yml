@@ -4,8 +4,8 @@ services:
     extra_hosts:
       - "keycloak.local:172.17.0.1"
     build:
-      context: .
-      dockerfile: spring.Dockerfile
+      context: backend
+      dockerfile: Dockerfile
     container_name: "banki-backend-app"
     env_file:
       - .env

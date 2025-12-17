@@ -532,11 +532,12 @@ banki/
 The project uses a **multi-stage Dockerfile** with dependency caching for fast rebuilds:
 
 **Stage 1: Builder**
+
 ```dockerfile
 FROM maven:3.9-eclipse-temurin-21 AS builder
-COPY pom.xml .
+COPY backend/pom.xml .
 RUN mvn dependency:go-offline -B  # Cached layer
-COPY src ./src
+COPY backend/src ./src
 RUN mvn clean package -DskipTests
 ```
 

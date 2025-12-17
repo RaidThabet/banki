@@ -5,7 +5,7 @@ npm-debug.log
 src/main/webapp/
 
 # Environment
-.env
+../.env
 .env.development
 .env.local
 
