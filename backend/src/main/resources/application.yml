@@ -48,3 +48,25 @@ springdoc:
 
 mail:
   from: ${FROM_EMAIL}
+
+keycloak:
+  auth-server-url: ${KEYCLOAK_FULL_URL}
+  realm: ${VITE_KEYCLOAK_REALM_NAME}
+  client-id: ${VITE_KEYCLOAK_CLIENT_ID}
+  client-secret: ${VITE_KEYCLOAK_CLIENT_SECRET}
+
+logging:
+  level:
+    reactor:
+      netty:
+        http:
+          client: DEBUG
+    io:
+      netty:
+        handler:
+          ssl: DEBUG
+    tp:
+      securite:
+        banki:
+          service:
+            KeycloakAdminService: DEBUG
