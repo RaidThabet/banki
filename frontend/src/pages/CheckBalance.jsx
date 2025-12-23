@@ -65,8 +65,8 @@ export default function CheckBalance() {
                       : "bg-white hover:bg-gray-100 border-gray-200"
                   }`}
                 >
-                  <p className="font-semibold">{account.name}</p>
-                  <p className="text-sm opacity-80">{account.type}</p>
+                  <p className="font-semibold">{account.id}</p>
+                  {/*<p className="text-sm opacity-80">{account.type}</p>*/}
                 </button>
               ))}
             </div>

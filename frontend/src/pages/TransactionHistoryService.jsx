@@ -58,8 +58,8 @@ export default function TransactionHistoryService() {
                 <thead>
                   <tr className="border-b border-gray-300">
                     <th className="p-3">ID</th>
-                    <th className="p-3">From</th>
-                    <th className="p-3">To</th>
+                    {/*<th className="p-3">From</th>*/}
+                    {/*<th className="p-3">To</th>*/}
                     <th className="p-3">Amount</th>
                     <th className="p-3">Type</th>
                     <th className="p-3">Status</th>
@@ -69,8 +69,8 @@ export default function TransactionHistoryService() {
                   {transactions.map((t) => (
                     <tr key={t.id} className="border-b border-gray-200">
                       <td className="p-3">{t.id}</td>
-                      <td className="p-3">{t.from}</td>
-                      <td className="p-3">{t.to}</td>
+                      {/*<td className="p-3">{t.from}</td>*/}
+                      {/*<td className="p-3">{t.to}</td>*/}
                       <td className="p-3">${t.amount.toLocaleString()}</td>
                       <td className="p-3 capitalize">{t.type}</td>
                       <td className="p-3 capitalize">{t.status}</td>

@@ -1,12 +1,20 @@
-import React, { createContext, useContext, useState } from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import { getTransactions } from "../api/transactions";
+import {useAccount} from "./AccountContext.jsx";
 
 const HistoryContext = createContext(null);
 
 export function HistoryProvider({ children }) {
+  const { activeAccount } = useAccount();
   const [transactions, setTransactions] = useState([]);
   const [form, setForm] = useState({ accountId: "", limit: 10 });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeAccount?.id) {
+      setForm((prev) => ({ ...prev, accountId: activeAccount.id }));
+    }
+  }, [activeAccount]);
 
   const handleInputChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 

@@ -1,13 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getBeneficiaries } from "../api/beneficiaries";
 import { createTransaction } from "../api/transactions";
+import {useAccount} from "./AccountContext.jsx";
 
 const TransferContext = createContext(null);
 
 export function TransferProvider({ children }) {
+  const { activeAccount } = useAccount();
   const [form, setForm] = useState({ beneficiaryId: "", amount: "", accountId: "" });
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeAccount?.id) {
+      setForm((prev) => ({ ...prev, accountId: activeAccount.id }));
+    }
+  }, [activeAccount]);
 
   const fetchBeneficiaries = async () => {
     setLoading(true);
@@ -28,6 +36,7 @@ export function TransferProvider({ children }) {
 
   const handleTransfer = async () => {
     if (!form.beneficiaryId || !form.amount || !form.accountId) {
+      console.log(form.beneficiaryId, form.amount, form.accountId);
       return alert("Please fill all fields");
     }
 
