@@ -17,13 +17,22 @@ A secure banking application built with Spring Boot and Keycloak for authenticat
    ```
 
 3. **Access the application**:
-   - API: http://banki.local/api/
-   - Swagger UI: http://banki.local/api/swagger-ui/index.html
-   - Keycloak Admin: http://admin.keycloak.local (permanent_admin/admin-password)
+   - Frontend: https://banki.local
+   - API: https://banki.local/api/
+   - Swagger UI: https://banki.local/api/swagger-ui/index.html
+   - Keycloak Admin: https://admin.keycloak.local (admin/admin-password)
 
-4. **Get a token and test**:
+4. **Accept SSL certificates** (required for proper functionality):
+   - Open your browser and visit each URL:
+     - https://banki.local
+     - https://keycloak.local
+     - https://admin.keycloak.local
+   - Accept the self-signed certificate warnings on each domain
+   - This is necessary for the frontend and authentication to work correctly
+
+5. **Get a token and test**:
    ```bash
-   curl -X POST http://keycloak.local/realms/banki-app/protocol/openid-connect/token \
+   curl -k -X POST https://keycloak.local/realms/banki-app/protocol/openid-connect/token \
      -d "grant_type=password" \
      -d "client_id=spring-boot-app" \
      -d "client_secret=vz8Wf5xpk892RuE8RaA6xQ7HwGvDX74D" \
@@ -42,7 +51,6 @@ For detailed setup instructions, see [Getting Started](#getting-started).
 - [Getting Started](#getting-started)
 - [Development Workflow](#development-workflow)
 - [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
 - [Security](#security)
 - [Technology Stack](#technology-stack)
 - [Troubleshooting](#troubleshooting)
@@ -68,14 +76,17 @@ For detailed setup instructions, see [Getting Started](#getting-started).
 - Transaction status tracking (PENDING, SUCCESS, FAILED)
 - Automatic transaction status updates (simulated processing after 1 minute)
 - Transfer to beneficiaries
+- **OTP (One-Time Password) verification** for secure transaction authorization
 
 ### Security & Auditing
 - OAuth2/JWT authentication via Keycloak
 - User auto-provisioning from Keycloak tokens
+- OTP (One-Time Password) functionality for transaction authorization
 - Audit logging for all actions
 - IP address tracking
 - Custom access denied handling
 - Role-based access control
+- SSL/TLS encryption for all communications
 
 ### API Documentation
 - Interactive Swagger UI
@@ -84,14 +95,15 @@ For detailed setup instructions, see [Getting Started](#getting-started).
 
 ## Architecture
 
-The application consists of the following containerized services, all accessed through custom domains on port 80:
+The application consists of the following containerized services, all accessed through custom domains via HTTPS (port 443) with automatic HTTP to HTTPS redirection:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Nginx Proxy (Port 80)                  │
+│              Nginx Proxy (Ports 80→443, 443)                │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
 │  │ banki.local  │  │keycloak.local│  │admin.keycloak.   │  │
-│  │    /api/*    │  │              │  │     local        │  │
+│  │  / (React)   │  │              │  │     local        │  │
+│  │  /api/*      │  │              │  │                  │  │
 │  └──────┬───────┘  └──────┬───────┘  └────────┬─────────┘  │
 └─────────┼──────────────────┼───────────────────┼────────────┘
           │                  │                   │
@@ -112,24 +124,28 @@ The application consists of the following containerized services, all accessed t
 
 ### Services
 
-- **nginx**: Reverse proxy listening on port 80, routing to different services based on domain
-  - `banki.local/api/*` → Spring Boot backend
-  - `keycloak.local` → Keycloak token issuer
-  - `admin.keycloak.local` → Keycloak admin console
+- **nginx**: Reverse proxy with SSL/TLS termination
+  - Listens on port 80 (redirects to HTTPS) and port 443 (SSL/TLS)
+  - Routes based on domain:
+    - `banki.local/` → React frontend (static files)
+    - `banki.local/api/*` → Spring Boot backend
+    - `keycloak.local` → Keycloak token issuer
+    - `admin.keycloak.local` → Keycloak admin console
 - **banki-backend**: Spring Boot application (internal Docker network, exposed via nginx)
-- **keycloak**: Keycloak authentication server (internal port 8080, exposed via nginx)
+- **keycloak**: Keycloak authentication server (internal port 8080, exposed via nginx with SSL)
 - **banki-postgres**: PostgreSQL database for application data (Port 5432)
 - **keycloak-db**: PostgreSQL database for Keycloak (Port 5433)
 
 ### Domain Routing
 
-All services use **port 80** (standard HTTP) with domain-based routing:
+All services use **HTTPS (port 443)** with domain-based routing. HTTP traffic on port 80 is automatically redirected to HTTPS:
 
-| Domain | Purpose | Backend Target |
-|--------|---------|----------------|
-| `banki.local/api/*` | Spring Boot REST API | `banki-backend:8080` |
-| `keycloak.local` | Keycloak token issuer & authentication | `keycloak:8080` |
-| `admin.keycloak.local` | Keycloak admin console | `keycloak:8080` |
+| Domain | Purpose | Backend Target | Protocol |
+|--------|---------|----------------|----------|
+| `banki.local/` | React Frontend | Static files in nginx | HTTPS |
+| `banki.local/api/*` | Spring Boot REST API | `banki-backend:8080` | HTTPS |
+| `keycloak.local` | Keycloak token issuer & authentication | `keycloak:8080` | HTTPS |
+| `admin.keycloak.local` | Keycloak admin console | `keycloak:8080` | HTTPS |
 
 ## Prerequisites
 
@@ -229,7 +245,7 @@ KEYCLOAK_CLIENT_ID=spring-boot-app
 KEYCLOAK_CLIENT_SECRET=vz8Wf5xpk892RuE8RaA6xQ7HwGvDX74D
 ```
 
-> **Important**: The `KEYCLOAK_FULL_URL` uses `http://keycloak.local` (port 80, standard HTTP) which is the hostname you added to your hosts file. All services are accessed via port 80 through different domains.
+> **Important**: The `KEYCLOAK_FULL_URL` uses `https://keycloak.local` (HTTPS) which is the hostname you added to your hosts file. All services are accessed via HTTPS (port 443) with automatic HTTP to HTTPS redirection.
 
 ### Step 3: Start the Application
 
@@ -259,27 +275,43 @@ docker compose logs -f banki-backend
 docker compose logs -f keycloak
 ```
 
-### Step 4: Access the Application
+### Step 4: Accept SSL Certificates
 
-Once all services are running, you can access them through their respective domains:
+**IMPORTANT**: Before using the application, you must manually accept the self-signed SSL certificates for all domains:
 
-- **Backend API**: http://banki.local/api/
-- **Swagger UI**: http://banki.local/api/swagger-ui/index.html
-- **API Docs (JSON)**: http://banki.local/api/api-docs
-- **Keycloak Admin Console**: http://admin.keycloak.local
-  - Username: `admin`
+1. Open your web browser
+2. Visit each of the following URLs:
+   - **https://banki.local**
+   - **https://keycloak.local**
+   - **https://admin.keycloak.local**
+3. For each URL, you will see a security warning about the self-signed certificate
+4. Click "Advanced" or "Continue to site" to accept the certificate
+5. This step is **required** for proper authentication and frontend functionality
+
+> **Why this is necessary**: The application uses self-signed SSL certificates for development. Browsers block requests to HTTPS endpoints with untrusted certificates unless you explicitly accept them. Without accepting all three certificates, authentication and API calls will fail.
+
+### Step 5: Access the Application
+
+Once all services are running and certificates are accepted, you can access:
+
+- **Frontend Application**: https://banki.local
+- **Backend API**: https://banki.local/api/
+- **Swagger UI**: https://banki.local/api/swagger-ui/index.html
+- **API Docs (JSON)**: https://banki.local/api/api-docs
+- **Keycloak Admin Console**: https://admin.keycloak.local
+  - Username: `permanent_admin`
   - Password: `admin-password`
-- **Keycloak Token Endpoint**: http://keycloak.local/realms/banki-app/protocol/openid-connect/token
+- **Keycloak Token Endpoint**: https://keycloak.local/realms/banki-app/protocol/openid-connect/token
 
-> **Note**: All services use **port 80** (standard HTTP), so you don't need to specify a port in the URLs.
+> **Note**: All services use **HTTPS (port 443)**. HTTP requests to port 80 are automatically redirected to HTTPS.
 
-### Step 5: Testing with Postman or cURL
+### Step 6: Testing with Postman or cURL
 
 #### 1. Get an Access Token
 
 **Using Postman:**
 ```http
-POST http://keycloak.local/realms/banki-app/protocol/openid-connect/token
+POST https://keycloak.local/realms/banki-app/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=password
@@ -289,9 +321,11 @@ grant_type=password
 &password=<keycloak-password>
 ```
 
+> **Note**: In Postman, you may need to disable SSL certificate verification (Settings → General → SSL certificate verification → OFF) for self-signed certificates.
+
 **Using cURL:**
 ```bash
-curl -X POST http://keycloak.local/realms/banki-app/protocol/openid-connect/token \
+curl -k -X POST https://keycloak.local/realms/banki-app/protocol/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=password" \
   -d "client_id=spring-boot-app" \
@@ -300,36 +334,13 @@ curl -X POST http://keycloak.local/realms/banki-app/protocol/openid-connect/toke
   -d "password=<keycloak-password>"
 ```
 
+> **Note**: The `-k` flag allows cURL to bypass SSL certificate verification for self-signed certificates.
+
 #### 2. Use the Token
 
 Copy the `access_token` from the response and include it in subsequent API requests:
 
 ```
-Authorization: Bearer <your-access-token>
-```
-
-#### 3. Example API Calls
-
-**Get all accounts:**
-```http
-GET http://banki.local/api/accounts
-Authorization: Bearer <your-access-token>
-```
-
-**Create a new account:**
-```http
-POST http://banki.local/api/accounts
-Authorization: Bearer <your-access-token>
-Content-Type: application/json
-
-{
-  "balance": 1000.0
-}
-```
-
-**Get transactions for an account:**
-```http
-GET http://banki.local/api/accounts/{account_id}/transactions
 Authorization: Bearer <your-access-token>
 ```
 
@@ -439,93 +450,9 @@ The application uses SpringDoc OpenAPI with custom Swagger annotations for compr
 
 ### Accessing Swagger UI
 
-Navigate to: **http://banki.local/api/swagger-ui/index.html**
+Navigate to: **https://banki.local/api/swagger-ui/index.html**
 
-> **Note**: All API endpoints are prefixed with `/api/` when accessed through the domain.
-
-### Available Endpoints
-
-#### Accounts API (`/api/accounts`)
-- `GET /api/accounts` - List all accounts for authenticated user
-- `GET /api/accounts/{account_id}` - Get specific account details
-- `POST /api/accounts` - Create a new account
-- `PUT /api/accounts/{account_id}/enable` - Enable an account
-- `PUT /api/accounts/{account_id}/disable` - Disable an account
-- `DELETE /api/accounts/{account_id}` - Delete an account
-
-#### Beneficiaries API (`/api/beneficiaries`)
-- `GET /api/beneficiaries` - List all beneficiaries
-- `POST /api/beneficiaries` - Add a new beneficiary
-- `DELETE /api/beneficiaries/{beneficiary_id}` - Remove a beneficiary
-
-#### Transactions API (`/api/accounts/{account_id}/transactions`)
-- `GET /api/accounts/{account_id}/transactions` - List all transactions for an account
-- `POST /api/accounts/{account_id}/transactions` - Create a new transaction
-
-### Swagger Features
-
-- **Custom Response Examples**: Each endpoint includes realistic JSON response examples
-- **Error Documentation**: 400, 401, 403, 404, and 500 errors documented with examples
-- **Request/Response Schemas**: Full DTO schemas with field descriptions
-- **Authentication**: Built-in OAuth2 authentication in Swagger UI
-
-## Project Structure
-
-```
-banki/
-├── src/
-│   └── main/
-│       ├── java/tp/securite/banki/
-│       │   ├── BankiApplication.java          # Main application class
-│       │   ├── config/                        # Configuration classes
-│       │   │   ├── SecurityConfig.java        # Spring Security configuration
-│       │   │   ├── JwtAuthConverter.java      # JWT to Authentication converter
-│       │   │   ├── DomainConfig.java          # JPA Auditing config
-│       │   │   └── CustomAccessDeniedHandler.java
-│       │   ├── controller/                    # REST Controllers
-│       │   │   ├── AccountController.java
-│       │   │   ├── BeneficiaryController.java
-│       │   │   ├── TransactionController.java
-│       │   │   └── GlobalExceptionHandler.java
-│       │   ├── domain/                        # JPA Entities
-│       │   │   ├── Account.java
-│       │   │   ├── Beneficiary.java
-│       │   │   ├── Transaction.java
-│       │   │   ├── User.java
-│       │   │   └── AuditLog.java
-│       │   ├── model/                         # DTOs
-│       │   │   ├── AccountDTO.java
-│       │   │   ├── BeneficiaryDTO.java
-│       │   │   ├── TransactionDTO.java
-│       │   │   └── CreateTransactionDTO.java
-│       │   ├── service/                       # Business logic
-│       │   │   ├── AccountsService.java
-│       │   │   ├── BeneficiaryService.java
-│       │   │   └── TransactionService.java
-│       │   ├── repos/                         # JPA Repositories
-│       │   ├── filters/                       # Security filters
-│       │   │   └── UserProvisioningFilter.java
-│       │   ├── swagger/                       # Swagger annotations
-│       │   │   ├── AccountControllerResponses.java
-│       │   │   ├── BeneficiaryControllerResponses.java
-│       │   │   └── TransactionControllerResponses.java
-│       │   ├── exceptions/                    # Custom exceptions
-│       │   │   ├── BusinessException.java
-│       │   │   └── ErrorCode.java
-│       │   └── util/                          # Utility classes
-│       └── resources/
-│           └── application.yml                # Application configuration
-├── keycloak-export/                           # Keycloak realm export
-│   ├── banki-app-realm.json                  # Realm configuration
-│   └── banki-app-users-0.json                # Pre-configured users
-├── docker-compose.yml                         # Docker Compose configuration
-├── spring.Dockerfile                          # Backend Dockerfile (multi-stage build)
-├── .dockerignore                              # Docker build context exclusions
-├── nginx.conf                                 # Nginx reverse proxy configuration
-├── .env                                       # Environment variables
-├── pom.xml                                    # Maven configuration
-└── README.md                                  # This file
-```
+> **Note**: All API endpoints are prefixed with `/api/` when accessed through the domain. Make sure you have accepted the SSL certificate for `banki.local` before accessing Swagger UI.
 
 ### Docker Build Optimization
 
@@ -563,17 +490,19 @@ The application uses **OAuth2 Resource Server** with **JWT tokens** issued by Ke
 
 #### Flow:
 1. User authenticates with Keycloak (username/password)
-2. Keycloak issues a JWT token with `iss: http://keycloak.local/realms/banki-app`
+2. Keycloak issues a JWT token with `iss: https://keycloak.local/realms/banki-app`
 3. Client includes token in `Authorization: Bearer <token>` header
 4. Spring Boot validates token signature and claims against Keycloak
 5. User is auto-provisioned in the application database if not exists
-6. Request proceeds with authenticated user context
+6. For sensitive operations (e.g., transactions), OTP verification is required
+7. Request proceeds with authenticated user context
 
 #### JWT Validation:
-- **Issuer**: Must be `http://keycloak.local/realms/banki-app`
+- **Issuer**: Must be `https://keycloak.local/realms/banki-app`
 - **Signature**: Validated using Keycloak's public keys (JWK Set)
 - **Expiration**: Token must not be expired
 - **Claims**: Subject (sub) claim contains user ID
+- **Transport Security**: All communications encrypted via SSL/TLS
 
 ### User Provisioning
 
@@ -622,9 +551,9 @@ All actions are logged in the `AuditLog` entity with:
 
 ## Troubleshooting
 
-### Issue: "Unable to connect" to domains (banki.local, keycloak.local, admin.keycloak.local)
+### Issue: "Unable to connect" or SSL connection errors
 
-**Cause**: Either services are not running or hosts file is not configured correctly.
+**Cause**: Either services are not running, hosts file is not configured correctly, or SSL certificates haven't been accepted.
 
 **Solution**:
 ```bash
@@ -646,21 +575,25 @@ ping keycloak.local
 ping admin.keycloak.local
 ```
 
-Wait for Keycloak to fully initialize (look for "Started Keycloak" in logs). Ensure all three domains are in your `/etc/hosts` file.
+Wait for Keycloak to fully initialize (look for "Started Keycloak" in logs). Ensure:
+1. All three domains are in your `/etc/hosts` file
+2. You have visited each HTTPS URL in your browser and accepted the self-signed certificates
+3. All services are running without errors
 
 ### Issue: "Token validation failed" or "Invalid issuer"
 
-**Cause**: The custom domains are not configured in your hosts file, or the `KEYCLOAK_FULL_URL` in `.env` is incorrect.
+**Cause**: The custom domains are not configured in your hosts file, the `KEYCLOAK_FULL_URL` in `.env` is incorrect, or SSL certificates haven't been accepted.
 
-**Solution**: 
+**Solution**:
 1. Verify your hosts file contains all three domains:
    ```
    127.0.0.1 banki.local
    127.0.0.1 keycloak.local
    127.0.0.1 admin.keycloak.local
    ```
-2. Verify `.env` has `KEYCLOAK_FULL_URL=http://keycloak.local`
-3. Restart services: `docker compose restart`
+2. Verify `.env` has `KEYCLOAK_FULL_URL=https://keycloak.local`
+3. Accept SSL certificates for all domains in your browser (see [Step 4](#step-4-accept-ssl-certificates))
+4. Restart services: `docker compose restart`
 
 See [Step 1](#step-1-configure-hosts-file) for detailed instructions.
 
@@ -680,26 +613,28 @@ If issues persist, check backend logs:
 docker compose logs banki-backend | grep -i error
 ```
 
-### Issue: "Port already in use" error (port 80, 5432, or 5433)
+### Issue: "Port already in use" error (port 80, 443, 5432, or 5433)
 
 **Cause**: Another application is using one of the required ports.
 
 **Solution**:
 ```bash
 # Check which process is using the port
-sudo lsof -i :80      # Linux/macOS
+sudo lsof -i :80      # HTTP (Linux/macOS)
+sudo lsof -i :443     # HTTPS
 sudo lsof -i :5432    # PostgreSQL
 sudo lsof -i :5433    # Keycloak DB
 
 # Windows
 netstat -ano | findstr :80
+netstat -ano | findstr :443
 netstat -ano | findstr :5432
 netstat -ano | findstr :5433
 
 # Stop the conflicting process or change ports in docker-compose.yml
 ```
 
-> **Note**: Port 80 requires sudo/admin privileges. If you cannot use port 80, update the `nginx` ports in `docker-compose.yml` to something like `8080:80` and access via `http://banki.local:8080/api/`.
+> **Note**: Ports 80 and 443 require sudo/admin privileges. If you cannot use these ports, update the `nginx` ports in `docker-compose.yml` (e.g., `8080:80` and `8443:443`) and access via custom ports like `https://banki.local:8443/`.
 
 ### Issue: Docker rebuild takes too long (re-downloading dependencies)
 
@@ -799,7 +734,7 @@ And nginx includes the `X-Forwarded-Prefix` header:
 proxy_set_header X-Forwarded-Prefix /api;
 ```
 
-Access Swagger at: `http://banki.local/api/swagger-ui/index.html`
+Access Swagger at: `https://banki.local/api/swagger-ui/index.html`
 
 ### Issue: IP address showing as `0:0:0:0:0:0:0:1` (IPv6 localhost)
 
