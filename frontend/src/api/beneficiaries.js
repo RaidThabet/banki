@@ -3,6 +3,7 @@ import api from "./api";
 export const getBeneficiaries = async () => {
   try {
     const response = await api.get("/beneficiaries");
+    console.log(response);
     // Ensure we always return an array
     return Array.isArray(response.data)
       ? response.data

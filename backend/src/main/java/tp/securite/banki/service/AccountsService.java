@@ -47,7 +47,7 @@ public class AccountsService {
         Account savedAccount = accountRepository.save(account);
 
         String ipAddress = ipAddressExtractor.getClientIpAddress(request);
-        String auditLogMessage = "User with id %s created a new account with id %s".formatted(owner, savedAccount.getId());
+        String auditLogMessage = "User with id %s created a new account with id %s".formatted(owner.getId(), savedAccount.getId());
 
         AuditLog auditLog = AuditLog.builder()
                 .userId(owner)

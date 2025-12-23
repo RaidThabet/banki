@@ -15,6 +15,7 @@ export const KeycloakProvider = ({ children }) => {
         if (!authenticated) {
           console.warn("User not authenticated");
         }
+        localStorage.setItem("jwt", keycloak.token);
         setInitialized(true);
       })
       .catch((err) => {
