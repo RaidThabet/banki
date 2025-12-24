@@ -61,31 +61,26 @@ For detailed setup instructions, see [Getting Started](#getting-started).
 ### Account Management
 - Create and manage bank accounts
 - View account balance and status
-- Enable/disable accounts
 - Multiple accounts per user support
 
 ### Beneficiary Management
 - Add beneficiaries for easy transfers
 - View all beneficiaries
-- Remove beneficiaries
-- Secure beneficiary validation
-
+- 
 ### Transaction Processing
 - Create transactions (deposits, withdrawals, transfers)
 - View transaction history per account
 - Transaction status tracking (PENDING, SUCCESS, FAILED)
 - Automatic transaction status updates (simulated processing after 1 minute)
 - Transfer to beneficiaries
-- **OTP (One-Time Password) verification** for secure transaction authorization
-
+- 
 ### Security & Auditing
 - OAuth2/JWT authentication via Keycloak
 - User auto-provisioning from Keycloak tokens
-- OTP (One-Time Password) functionality for transaction authorization
-- Audit logging for all actions
+- OTP (One-Time Password) functionality for user login
+- Audit logging for important actions
 - IP address tracking
 - Custom access denied handling
-- Role-based access control
 - SSL/TLS encryption for all communications
 
 ### API Documentation
@@ -216,34 +211,7 @@ For the application to work correctly with Keycloak's JWT token validation and t
 
 ### Step 2: Environment Configuration
 
-The `.env` file is already configured in the project root. Verify it contains:
-
-```properties
-PRODUCTION=false
-API_PATH=
-
-# Main app database
-DB_URL=jdbc:postgresql://banki-postgres
-DB_PORT=5432
-DB_USERNAME=isimmconnect-user
-DB_PASSWORD=isimmconnect-pass
-DB_NAME=isimm_connect
-
-# Keycloak database
-KEYCLOAK_DB_USERNAME=keycloakdb-user
-KEYCLOAK_DB_PASSWORD=keycloakdb-pass
-KEYCLOAK_DB_NAME=keycloak
-
-# Keycloak app
-KEYCLOAK_FULL_URL=http://keycloak.local
-KEYCLOAK_REALM_NAME=banki-app
-KEYCLOAK_ADMIN_USER=admin
-KEYCLOAK_ADMIN_PASSWORD=admin-password
-
-# Keycloak client
-KEYCLOAK_CLIENT_ID=spring-boot-app
-KEYCLOAK_CLIENT_SECRET=vz8Wf5xpk892RuE8RaA6xQ7HwGvDX74D
-```
+The `.env` file is already configured in the project root
 
 > **Important**: The `KEYCLOAK_FULL_URL` uses `https://keycloak.local` (HTTPS) which is the hostname you added to your hosts file. All services are accessed via HTTPS (port 443) with automatic HTTP to HTTPS redirection.
 
@@ -262,7 +230,7 @@ This will:
 4. Start Nginx reverse proxy
 5. Start the Spring Boot application
 
-**First-time startup may take 2-3 minutes** as Docker builds the Spring Boot image and Keycloak initializes the realm.
+**First-time startup may take a few minutes** as Docker builds the Spring Boot image and Keycloak initializes the realm.
 
 Check the status of all containers:
 ```bash
@@ -303,47 +271,6 @@ Once all services are running and certificates are accepted, you can access:
   - Password: `admin-password`
 - **Keycloak Token Endpoint**: https://keycloak.local/realms/banki-app/protocol/openid-connect/token
 
-> **Note**: All services use **HTTPS (port 443)**. HTTP requests to port 80 are automatically redirected to HTTPS.
-
-### Step 6: Testing with Postman or cURL
-
-#### 1. Get an Access Token
-
-**Using Postman:**
-```http
-POST https://keycloak.local/realms/banki-app/protocol/openid-connect/token
-Content-Type: application/x-www-form-urlencoded
-
-grant_type=password
-&client_id=spring-boot-app
-&client_secret=vz8Wf5xpk892RuE8RaA6xQ7HwGvDX74D
-&username=<keycloak-username>
-&password=<keycloak-password>
-```
-
-> **Note**: In Postman, you may need to disable SSL certificate verification (Settings → General → SSL certificate verification → OFF) for self-signed certificates.
-
-**Using cURL:**
-```bash
-curl -k -X POST https://keycloak.local/realms/banki-app/protocol/openid-connect/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=password" \
-  -d "client_id=spring-boot-app" \
-  -d "client_secret=vz8Wf5xpk892RuE8RaA6xQ7HwGvDX74D" \
-  -d "username=<keycloak-username>" \
-  -d "password=<keycloak-password>"
-```
-
-> **Note**: The `-k` flag allows cURL to bypass SSL certificate verification for self-signed certificates.
-
-#### 2. Use the Token
-
-Copy the `access_token` from the response and include it in subsequent API requests:
-
-```
-Authorization: Bearer <your-access-token>
-```
-
 ### Stopping the Application
 
 To stop all services:
@@ -356,78 +283,6 @@ To stop and remove all data (volumes):
 docker compose down -v
 ```
 
-## Development Workflow
-
-### Making Code Changes
-
-The project is configured with Docker build caching for fast development iterations:
-
-1. **Edit your Java code** in `src/main/java/`
-
-2. **Rebuild and restart** the backend container:
-   ```bash
-   docker compose up -d --build banki-backend
-   ```
-
-3. **View logs** to verify changes:
-   ```bash
-   docker compose logs -f banki-backend
-   ```
-
-**Build times:**
-- First build: ~2-3 minutes (downloads all dependencies)
-- Subsequent builds (code changes only): ~10-30 seconds
-- Dependency changes (`pom.xml` modified): ~1-2 minutes
-
-### Working with the Database
-
-**Access PostgreSQL directly:**
-```bash
-# Application database
-docker exec -it banki-postgres psql -U isimmconnect-user -d isimm_connect
-
-# Keycloak database
-docker exec -it banki-keycloak-db psql -U keycloakdb-user -d keycloak
-```
-
-**Reset the database:**
-```bash
-docker compose down -v
-docker compose up -d
-```
-
-### Viewing Logs
-
-**All services:**
-```bash
-docker compose logs -f
-```
-
-**Specific service:**
-```bash
-docker compose logs -f banki-backend
-docker compose logs -f keycloak
-docker compose logs -f nginx
-```
-
-**Filter logs:**
-```bash
-# Show only errors
-docker compose logs banki-backend | grep -i error
-
-# Show last 50 lines
-docker compose logs --tail=50 banki-backend
-```
-
-### Adding New Dependencies
-
-1. Add dependency to `pom.xml`
-2. Rebuild the container:
-   ```bash
-   docker compose build --no-cache banki-backend
-   docker compose up -d
-   ```
-
 ### Keycloak Configuration Changes
 
 **Import a new realm:**
@@ -437,12 +292,6 @@ docker compose logs --tail=50 banki-backend
    ```bash
    docker compose restart keycloak
    ```
-
-**Reset Keycloak data:**
-```bash
-docker compose down -v
-docker compose up -d
-```
 
 ## API Documentation
 
@@ -473,12 +322,6 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre
 COPY --from=builder /app/target/*.jar app.jar
 ```
-
-**Benefits:**
-- Maven dependencies are cached and only re-downloaded when `pom.xml` changes
-- Source code changes only trigger recompilation, not dependency download
-- Final image is smaller (JRE instead of full JDK + Maven)
-- Typical rebuild time: **10-30 seconds** (vs 2-3 minutes for full build)
 
 The `.dockerignore` file prevents cache invalidation from IDE files, build artifacts, and other non-source files.
 
@@ -517,13 +360,6 @@ All actions are logged in the `AuditLog` entity with:
 - **Timestamp**: When the action occurred
 - **Details**: Additional contextual information
 
-### Access Control
-
-- All endpoints require authentication (except Swagger UI)
-- Users can only access their own accounts, beneficiaries, and transactions
-- Account ownership is validated on every request
-- Custom access denied handler provides clear error messages
-
 ## Technology Stack
 
 ### Backend
@@ -549,226 +385,6 @@ All actions are logged in the `AuditLog` entity with:
 - **Swagger UI** with custom annotations
 - **OpenAPI 3.0** specification
 
-## Troubleshooting
-
-### Issue: "Unable to connect" or SSL connection errors
-
-**Cause**: Either services are not running, hosts file is not configured correctly, or SSL certificates haven't been accepted.
-
-**Solution**:
-```bash
-# Check if all services are running
-docker compose ps
-
-# Check Keycloak logs
-docker compose logs keycloak
-
-# Check Nginx logs
-docker compose logs nginx
-
-# Check backend logs
-docker compose logs banki-backend
-
-# Verify hosts file configuration
-ping banki.local
-ping keycloak.local
-ping admin.keycloak.local
-```
-
-Wait for Keycloak to fully initialize (look for "Started Keycloak" in logs). Ensure:
-1. All three domains are in your `/etc/hosts` file
-2. You have visited each HTTPS URL in your browser and accepted the self-signed certificates
-3. All services are running without errors
-
-### Issue: "Token validation failed" or "Invalid issuer"
-
-**Cause**: The custom domains are not configured in your hosts file, the `KEYCLOAK_FULL_URL` in `.env` is incorrect, or SSL certificates haven't been accepted.
-
-**Solution**:
-1. Verify your hosts file contains all three domains:
-   ```
-   127.0.0.1 banki.local
-   127.0.0.1 keycloak.local
-   127.0.0.1 admin.keycloak.local
-   ```
-2. Verify `.env` has `KEYCLOAK_FULL_URL=https://keycloak.local`
-3. Accept SSL certificates for all domains in your browser (see [Step 4](#step-4-accept-ssl-certificates))
-4. Restart services: `docker compose restart`
-
-See [Step 1](#step-1-configure-hosts-file) for detailed instructions.
-
-### Issue: 401 Unauthorized when accessing Swagger UI or API endpoints
-
-**Cause**: Spring Boot cannot resolve `keycloak.local` from inside the Docker container.
-
-**Solution**: The `docker-compose.yml` includes `extra_hosts` mapping for the backend container. Verify it exists:
-```yaml
-banki-backend:
-  extra_hosts:
-    - "keycloak.local:172.17.0.1"
-```
-
-If issues persist, check backend logs:
-```bash
-docker compose logs banki-backend | grep -i error
-```
-
-### Issue: "Port already in use" error (port 80, 443, 5432, or 5433)
-
-**Cause**: Another application is using one of the required ports.
-
-**Solution**:
-```bash
-# Check which process is using the port
-sudo lsof -i :80      # HTTP (Linux/macOS)
-sudo lsof -i :443     # HTTPS
-sudo lsof -i :5432    # PostgreSQL
-sudo lsof -i :5433    # Keycloak DB
-
-# Windows
-netstat -ano | findstr :80
-netstat -ano | findstr :443
-netstat -ano | findstr :5432
-netstat -ano | findstr :5433
-
-# Stop the conflicting process or change ports in docker-compose.yml
-```
-
-> **Note**: Ports 80 and 443 require sudo/admin privileges. If you cannot use these ports, update the `nginx` ports in `docker-compose.yml` (e.g., `8080:80` and `8443:443`) and access via custom ports like `https://banki.local:8443/`.
-
-### Issue: Docker rebuild takes too long (re-downloading dependencies)
-
-**Cause**: Docker cache is invalidated by changes in non-source files.
-
-**Solution**: The project includes a `.dockerignore` file that prevents cache invalidation. Verify it exists and contains:
-```dockerignore
-target/
-.idea/
-.git/
-node_modules/
-.env
-```
-
-The `spring.Dockerfile` uses multi-stage caching:
-- Maven dependencies are cached in a separate layer
-- Only changes to `pom.xml` trigger dependency re-download
-- Code changes only rebuild the application, not dependencies
-
-**To verify caching works:**
-```bash
-# First build
-docker compose build banki-backend
-
-# Make a code change in src/
-# Then rebuild - should see "CACHED" for dependency layer
-docker compose build banki-backend
-```
-
-You should see output like:
-```
-=> CACHED [builder 3/5] COPY pom.xml .
-=> CACHED [builder 4/5] RUN mvn dependency:go-offline -B
-```
-
-### Issue: Changes to code not reflected after rebuild
-
-**Cause**: Container is using old image or needs restart.
-
-**Solution**:
-```bash
-# Rebuild and restart the specific service
-docker compose up -d --build banki-backend
-
-# Or full restart
-docker compose down
-docker compose up -d --build
-```
-
-### Issue: Database connection errors
-
-**Cause**: Database containers may not be ready when the backend starts.
-
-**Solution**: Spring Boot will automatically retry. If issues persist:
-```bash
-# Restart backend only
-docker compose restart banki-backend
-
-# Or check database logs
-docker compose logs banki-postgres
-docker compose logs keycloak-db
-```
-
-### Issue: Keycloak realm not imported or users missing
-
-**Cause**: Realm files in `keycloak-export/` may be corrupted, missing, or not mounted correctly.
-
-**Solution**:
-```bash
-# Verify export files exist
-ls -la keycloak-export/
-
-# Should contain:
-# - banki-app-realm.json
-# - banki-app-users-0.json
-
-# Remove volumes and restart
-docker compose down -v
-docker compose up -d
-
-# Check Keycloak logs for import messages
-docker compose logs keycloak | grep -i import
-```
-
-### Issue: Swagger redirects incorrectly or shows duplicate paths
-
-**Cause**: Spring Boot context path configuration or nginx rewrite rules.
-
-**Solution**: Ensure your `application.yml` has:
-```yaml
-server:
-  forward-headers-strategy: framework
-```
-
-And nginx includes the `X-Forwarded-Prefix` header:
-```nginx
-proxy_set_header X-Forwarded-Prefix /api;
-```
-
-Access Swagger at: `https://banki.local/api/swagger-ui/index.html`
-
-### Issue: IP address showing as `0:0:0:0:0:0:0:1` (IPv6 localhost)
-
-**Cause**: Java prefers IPv6 by default when running locally.
-
-**Solution**: This is expected behavior. The application automatically converts IPv6 localhost (`::1`) to IPv4 format (`127.0.0.1`) for audit logging. No action needed.
-
-## Further Reading
-
-### Spring Framework
-* [Spring Boot Reference](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
-* [Spring Data JPA](https://docs.spring.io/spring-data/jpa/reference/jpa.html)
-* [Spring Security OAuth2 Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html)
-
-### Authentication
-* [Keycloak Documentation](https://www.keycloak.org/documentation)
-* [OAuth 2.0 RFC](https://datatracker.ietf.org/doc/html/rfc6749)
-* [JWT Introduction](https://jwt.io/introduction)
-
-### Database & Infrastructure
-* [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-* [Docker Documentation](https://docs.docker.com/)
-* [Nginx Documentation](https://nginx.org/en/docs/)
-
-### Build Tools
-* [Maven Documentation](https://maven.apache.org/guides/index.html)
-* [Lombok Features](https://projectlombok.org/features/)
-
-### API Documentation
-* [SpringDoc OpenAPI](https://springdoc.org/)
-* [OpenAPI Specification](https://swagger.io/specification/)
-
----
-
 **Project**: Banki - Secure Banking Application  
-**Course**: Sécurité - ING2 S1  
-**Year**: 2025  
+**Course**: Computer Security - ING2 S1  
+**Academic Year**: 2025/2026  
