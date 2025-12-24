@@ -42,20 +42,6 @@ A secure banking application built with Spring Boot and Keycloak for authenticat
 
 For detailed setup instructions, see [Getting Started](#getting-started).
 
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [API Documentation](#api-documentation)
-- [Security](#security)
-- [Technology Stack](#technology-stack)
-- [Troubleshooting](#troubleshooting)
-- [Further Reading](#further-reading)
-
 ## Features
 
 ### Account Management
