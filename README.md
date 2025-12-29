@@ -323,8 +323,7 @@ The application uses **OAuth2 Resource Server** with **JWT tokens** issued by Ke
 3. Client includes token in `Authorization: Bearer <token>` header
 4. Spring Boot validates token signature and claims against Keycloak
 5. User is auto-provisioned in the application database if not exists
-6. For sensitive operations (e.g., transactions), OTP verification is required
-7. Request proceeds with authenticated user context
+6. Request proceeds with authenticated user context
 
 #### JWT Validation:
 - **Issuer**: Must be `https://keycloak.local/realms/banki-app`
