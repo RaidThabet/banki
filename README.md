@@ -4,25 +4,33 @@ A secure banking application built with Spring Boot and Keycloak for authenticat
 
 ## Quick Start
 
-1. **Add domains to your hosts file** (`/etc/hosts` on Linux/macOS, `C:\Windows\System32\drivers\etc\hosts` on Windows):
+1. **Build the frontend** (required before starting containers):
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   cd ..
+   ```
+
+2. **Add domains to your hosts file** (`/etc/hosts` on Linux/macOS, `C:\Windows\System32\drivers\etc\hosts` on Windows):
    ```
    127.0.0.1 banki.local
    127.0.0.1 keycloak.local
    127.0.0.1 admin.keycloak.local
    ```
 
-2. **Start all services**:
+3. **Start all services**:
    ```bash
    docker compose up -d
    ```
 
-3. **Access the application**:
+4. **Access the application**:
    - Frontend: https://banki.local
    - API: https://banki.local/api/
    - Swagger UI: https://banki.local/api/swagger-ui/index.html
    - Keycloak Admin: https://admin.keycloak.local (admin/admin-password)
 
-4. **Accept SSL certificates** (required for proper functionality):
+5. **Accept SSL certificates** (required for proper functionality):
    - Open your browser and visit each URL:
      - https://banki.local
      - https://keycloak.local
@@ -30,7 +38,7 @@ A secure banking application built with Spring Boot and Keycloak for authenticat
    - Accept the self-signed certificate warnings on each domain
    - This is necessary for the frontend and authentication to work correctly
 
-5. **Get a token and test**:
+6. **Get a token and test**:
    ```bash
    curl -k -X POST https://keycloak.local/realms/banki-app/protocol/openid-connect/token \
      -d "grant_type=password" \
