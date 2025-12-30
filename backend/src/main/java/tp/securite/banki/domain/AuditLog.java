@@ -45,7 +45,7 @@ public class AuditLog {
     private String details;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id_id")
+    @JoinColumn(name = "user_id")
     private User userId;
 
     @CreatedDate
