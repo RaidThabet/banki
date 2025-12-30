@@ -16,6 +16,11 @@ public class UserAccountService {
     private final UserRepository userRepository;
     private final KeycloakAdminService keycloakAdminService;
 
+    public User getUserAccountInformations(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
+    }
+
     public User updateUserAccountInformations(
             UUID userId,
             String newPhoneNumber,

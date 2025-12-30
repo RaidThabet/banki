@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tp.securite.banki.domain.User;
 import tp.securite.banki.model.UserAccountDTO;
 import tp.securite.banki.service.UserAccountService;
@@ -25,6 +22,26 @@ import java.util.UUID;
 public class UserAccountController {
 
     private final UserAccountService userAccountService;
+
+    @Operation(
+            summary = "Retrieve user account informations",
+            description = "Retrieve the email and phone number of the authenticated user"
+    )
+    @UserAccountControllerResponses.GetUserAccountResponse
+    @GetMapping
+    public ResponseEntity<UserAccountDTO> getUserAccount(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        User user = userAccountService.getUserAccountInformations(userId);
+
+        UserAccountDTO responseDTO = UserAccountDTO.builder()
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
+
+        return ResponseEntity.ok(responseDTO);
+    }
 
     @Operation(
             summary = "Update user account informations",

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import tp.securite.banki.model.AccountDTO;
 import tp.securite.banki.model.UserAccountDTO;
 
 import java.lang.annotation.ElementType;
@@ -27,6 +26,21 @@ public class UserAccountControllerResponses {
             ),
     })
     public @interface UpdateUserAccountResponse {
+    }
+
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User account retrieved successfully",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserAccountDTO.class)
+                    )
+            ),
+    })
+    public @interface GetUserAccountResponse {
     }
 
 }
